@@ -76,23 +76,31 @@ function start() {
     lastTrans.innerText = '💤';
     statusField.innerText = 'Connecting...';
 
+
     var config = {
         sdpSemantics: 'unified-plan'
     };
 
     pc = new RTCPeerConnection(config);
 
+    lastTrans.innerText += '\n[CYL] 1';
+
     var parameters = {};
 
+    lastTrans.innerText += '\n[CYL] Closed data channel';
     dc = pc.createDataChannel('chat', parameters);
     dc.onclose = function () {
         clearInterval(dcInterval);
         console.log('Closed data channel');
         btn_show_start();
     };
+
+    lastTrans.innerText += '\n[CYL] Opened data channel';
     dc.onopen = function () {
         console.log('Opened data channel');
     };
+
+    lastTrans.innerText += '\n[CYL] Listening...';
     dc.onmessage = function (evt) {
         statusField.innerText = 'Listening...';
         var msg = evt.data;
@@ -113,6 +121,7 @@ function start() {
         }
     };
 
+    lastTrans.innerText += '\n[CYL] Disconnected';
     pc.oniceconnectionstatechange = function () {
         if (pc.iceConnectionState == 'disconnected') {
             console.log('Disconnected');
@@ -125,6 +134,7 @@ function start() {
         video: false
     };
 
+    lastTrans.innerText += '\n[CYL] Could not acquire media';
     navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
         stream.getTracks().forEach(function (track) {
             pc.addTrack(track, stream);

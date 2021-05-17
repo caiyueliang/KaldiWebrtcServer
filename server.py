@@ -29,6 +29,7 @@ async def index(request):
 
 
 async def offer(request):
+    root.warning("[offer] start: {}".format(request))
     kaldi_server = await kaldi_server_queue.get()
     if not kaldi_server:
         raise HTTPServiceUnavailable()
@@ -44,20 +45,24 @@ async def offer(request):
 
     @pc.on('datachannel')
     async def on_datachannel(channel):
+        root.warning("[on_datachannel] channel: {}".format(channel))
         await kaldi.set_text_channel(channel)
 
     @pc.on('iceconnectionstatechange')
     async def on_iceconnectionstatechange():
+        root.warning("[on_iceconnectionstatechange] enter")
         if pc.iceConnectionState == 'failed':
             await pc.close()
 
     @pc.on('track')
     async def on_track(track):
+        root.warning("[on_track] track.kind: {}".format(track.kind))
         if track.kind == 'audio':
             await kaldi.set_audio_track(track)
 
         @track.on('ended')
         async def on_ended():
+            root.warning("[on_ended] enter")
             await kaldi.stop()
 
     await pc.setRemoteDescription(offer)
